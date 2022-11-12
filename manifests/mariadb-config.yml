@@ -1,0 +1,37 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/name: mariadb-pdns
+    app.kubernetes.io/part-of: pdns
+    app.kubernetes.io/component: mariadb
+  name: mariadb-pdns-config
+  namespace: pdns
+data:
+  ALLOW_EMPTY_PASSWORD: "no"
+  MARIADB_DATABASE: "powerdns"
+  MARIADB_PASSWORD: "<ADMIN_USER_PASSWORD>"
+  MARIADB_USER: "admin"
+  mariadb-override.cnf: |
+    [mysqld]
+    collation-server = utf8mb4_unicode_ci
+    init-connect='SET NAMES utf8mb4'
+    character-set-server = utf8mb4
+    innodb_buffer_pool_size = 134217728
+    innodb_log_file_size = 134217728
+    innodb-log-files-in-group = 3
+    binlog_format = ROW
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  labels:
+    app.kubernetes.io/name: mariadb-pdns
+    app.kubernetes.io/part-of: pdns
+    app.kubernetes.io/component: mariadb
+  name: mariadb-pdns-secret
+  namespace: pdns
+stringData:
+  username: MYSQL_ROOT_PASSWORD
+  password: <PASSWORD>
