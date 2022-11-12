@@ -1,0 +1,70 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/name: mariadb-pdns
+    app.kubernetes.io/part-of: pdns
+    app.kubernetes.io/component: mariadb
+  name: mariadb-pdns
+  namespace: pdns
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: mariadb-pdns
+      app.kubernetes.io/part-of: pdns
+      app.kubernetes.io/component: mariadb
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: mariadb-pdns
+        app.kubernetes.io/part-of: pdns
+        app.kubernetes.io/component: mariadb
+    spec:
+      containers:
+      - name: mariadb-pdns
+        image: mariadb:10.3.20
+        imagePullPolicy: IfNotPresent
+        env:
+          - name: MYSQL_ROOT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: mariadb-pdns-secret
+                key: password
+        ports:
+        - containerPort: 3306
+          protocol: TCP
+        resources:
+          limits:
+            cpu: 500m
+            memory: 512Mi
+          requests:
+            cpu: 125m
+            memory: 128Mi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - name: mariadb-pdns-storage
+          mountPath: /var/lib/mysql
+        - name: mariadb-pdns-config
+          mountPath: /etc/mysql/conf.d
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext:
+        runAsUser: 0
+        runAsGroup: 0
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: mariadb-pdns-config
+          configMap:
+            name: mariadb-pdns-config
+            items:
+              - key: mariadb-override.cnf
+                path: mariadb-override.cnf
+        - name: mariadb-pdns-storage
+          persistentVolumeClaim:
+            claimName: mariadb-pdns-pvc
