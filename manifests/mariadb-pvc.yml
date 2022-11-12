@@ -1,0 +1,30 @@
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mariadb-pdns-pv
+  namespace: pdns
+spec:
+  accessModes:
+  - ReadWriteMany
+  capacity:
+    storage: 5000Mi
+  glusterfs:
+    endpoints: pdns-gluster-endpoints
+    path: /pdns-db-pv
+    readOnly: false
+  persistentVolumeReclaimPolicy: Retain
+  volumeMode: Filesystem
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mariadb-pdns-pvc
+  namespace: pdns
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 5000Mi
+  volumeMode: Filesystem
