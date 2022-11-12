@@ -1,4 +1,7 @@
 # PDNS-MariaDB Production-ready on Kubernetes
+
+<p align="center"><img src="images/powerdns.jpg"/></p>
+
 The ultimate goal of this repository: A distributed pdns with MariaDB-Galera cluster backend
 
 ## Requirements
